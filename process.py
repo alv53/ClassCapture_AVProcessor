@@ -1,8 +1,11 @@
 # This script will be run at a set interval (say every night at 3am)
 import ConfigParser, requests, json, sys
 
+# Some configurations
 # Replace this with live url when deploying
 API_url = "http://classcapture.cs.illinois.edu"
+username = "ajou2@illinois.edu"
+password = "CCpassword1"
 
 def GetSectionsJson():
 	# Start a session to save cookies 
@@ -10,7 +13,7 @@ def GetSectionsJson():
 	
 	# Login with a valid classcapture account
 	login_url = API_url + "/api/user/login"
-	data = {"email":"ajou2@illinois.edu","password":"CCpassword1"}
+	data = {"email":username ,"password":password}
 	headers = {'Content-type': 'application/json', 'Accept': 'text/plain', 'consumer-device-id': 123}
 	r = s.post(login_url, data=json.dumps(data), headers=headers)
 

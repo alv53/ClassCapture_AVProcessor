@@ -23,7 +23,7 @@ def Cleanup(folder):
 	for the_file in os.listdir(folder):
 		file_path = os.path.join(folder, the_file)
 		try:
-			if os.path.isfile(file_path):
+			if os.path.isfile(file_path) and not the_file.startswith('.'):
 				os.unlink(file_path)
 		except Exception, e:
 			print e
@@ -31,13 +31,6 @@ def Cleanup(folder):
 def writeToLog(message):
 	currTime = time.strftime("%H:%M:%S")
 	logger.write(currTime + ": " + message + "\n")
-
-def updateConfigTime():
-	# Update time
-	currTime = time.strftime("%m-%d-%Y-%H:%M:%S")
-	config.set('Independent Video Stabilization', 'last update', currTime)
-	with open("config.cfg", "w") as configfile:
-		config.write(configfile)
 
 # Get a list of files that have not been processed by independent video stabilization
 def getUnprocessedIndep(recordings):
@@ -78,6 +71,9 @@ def UpdateVideo(filename):
 	else:
 		processedVideos.append(filename)
 	config.set('Independent Video Stabilization', 'files', ','.join(processedVideos))
+	# Update time
+	currTime = time.strftime("%m-%d-%Y-%H:%M:%S")
+	config.set('Independent Video Stabilization', 'last update', currTime)
 	with open('config.cfg', 'w+') as configfile:
 		config.write(configfile)
 	writeToLog("\tCompleted update for file: " + filename)

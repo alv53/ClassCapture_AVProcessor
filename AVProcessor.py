@@ -60,8 +60,8 @@ def DownloadVideo(filename):
 
 # Process video, stored in UnprocessedVideos/ and puts results in ProcessedVideos/
 def ProcessVideo(filename):
-	#TODO: Tim put your algorithm for independent video stabilization here.
 	writeToLog("Performing stabilization for file: " + filename)
+	#TODO: Tim put your algorithm for independent video stabilization here.
 	shutil.copyfile("UnprocessedVideos/" + filename, "ProcessedVideos/" + filename)
 	writeToLog("\tCompleted stabilization for file: " + filename)
 	

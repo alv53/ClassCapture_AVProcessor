@@ -19,18 +19,32 @@ sftp_password = "freshhook19"
 sftp_url = "classcapture1.cs.illinois.edu"
 
 # Delete all locally stored files in the 2 video directories
-def Cleanup(folder):
-	for the_file in os.listdir(folder):
-		file_path = os.path.join(folder, the_file)
-		try:
-			if os.path.isfile(file_path) and not the_file.startswith('.'):
-				os.unlink(file_path)
-		except Exception, e:
-			print e
+def Cleanup(fileToDelete):
+	# delete ProcessedVideos/*file*
+	writeToLog("Cleanup for " + fileToDelete)
+	try:
+		filename = "ProcessedVideos/" + fileToDelete
+		if os.path.isfile(filename):
+			os.remove(filename)
+			writeToLog("\tDeleted " + fileToDelete + " from ProcessedVideos.")
+	except Exception, e:
+		print e
+		writeToLog("\tFailed to delete " + fileToDelete + " from ProcessedVideos.")
+	# delete UnprocessedVideos/*file*
+	try:
+		filename = "UnprocessedVideos/" + fileToDelete
+		if os.path.isfile(filename):
+			os.remove(filename)
+			writeToLog("\tDeleted " + fileToDelete + " from UnprocessedVideos.")
+	except Exception, e:
+		print e
+		writeToLog("\tFailed to delete " + fileToDelete + " from UnprocessedVideos.")
 # Write to log in format timestampe: message
 def writeToLog(message):
 	currTime = time.strftime("%H:%M:%S")
-	logger.write(currTime + ": " + message + "\n")
+	logMsg = currTime + ": " + message
+	logger.write(logMsg + "\n")
+	print logMsg
 
 # Get a list of files that have not been processed by independent video stabilization
 def getUnprocessedIndep(recordings):
@@ -64,7 +78,6 @@ def UpdateVideo(filename):
 	config = ConfigParser.RawConfigParser()
 	config.read("config.cfg")
 	processedVideos = config.get('Independent Video Stabilization', 'files').split(',')
-	print processedVideos
 	# If there are no files, just make the config value the current file, else append the file to the list
 	if len(processedVideos) == 1 and processedVideos[0] == '':
 		processedVideos = [filename]
@@ -116,14 +129,12 @@ if loggedIn:
 	videos = getUnprocessedIndep(videos)
 	writeToLog("Will now download, process, and update " + str(len(videos)) + " files")
 	# Three seperate loops to make log file cleaner (all the downloads + all the processing + all the updating)
-	# Download videos
 	for video in videos:
+		# Download videos
 		DownloadVideo(video)
-	# Process videos
-	for video in videos:
+		# Process videos
 		ProcessVideo(video)
-	# Update videos in API
-	for video in videos:
+		# Update videos in API
 		UpdateVideo(video)
-	Cleanup('ProcessedVideos')
-	Cleanup('UnprocessedVideos')
+		# delete unprocessed and processed videos
+		Cleanup(video)

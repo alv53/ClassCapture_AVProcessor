@@ -75,6 +75,15 @@ def ProcessVideo(filename):
 # Update video in API
 def UpdateVideo(filename):
 	writeToLog("Performing update for file: " + filename)
+
+	# sftp in and update video
+	localpath = "ProcessedVideos/" + filename
+	with pysftp.Connection(sftp_url, username=sftp_username, password=sftp_password) as sftp:
+		with sftp.cd('classcapture_videos/'):
+			sftp.put(localpath)
+			writeToLog("\tUploaded to API, file: " + filename)
+
+	#Update config
 	config = ConfigParser.RawConfigParser()
 	config.read("config.cfg")
 	processedVideos = config.get('Independent Video Stabilization', 'files').split(',')

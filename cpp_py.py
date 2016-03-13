@@ -5,8 +5,16 @@ import shutil
 import os
 
 def wrap_cpp(modname, filenames):
+        """Make C++ files importable in the current directory as one Python
+module.
+       
+        Args:
+                modname: str, desired name for the resulting Python module.
+                filenames: list of str, names of the C++ files that will comprise
+the module.
+         """
 	# wrap C++ vstab code in Python
-        setup(name="videostab",
+        setup(name=modname,
                 script_name = 'cpp_py.py',
                 script_args = ['build'],
                 ext_modules=[
@@ -15,7 +23,7 @@ def wrap_cpp(modname, filenames):
 "opencv_features2d", "opencv_imgproc", "opencv_video"])
                 ])
 
-        # make library file importable in current directory
+        # make module importable in current directory
         shutil.copyfile(os.path.join(os.getcwd(),
 'build/lib.linux-x86_64-2.7/videostab.so'), os.path.join(os.getcwd(),
 'videostab.so'))

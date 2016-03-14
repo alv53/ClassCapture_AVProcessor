@@ -36,7 +36,7 @@ sftp_username = args.sftp_username
 sftp_password = args.sftp_password
 sftp_url = "classcapture1.cs.illinois.edu"
 
-if API_username is None or API_password is None or sftp_username is None or sfp_username is None:
+if API_username is None or API_password is None or sftp_username is None or sftp_password is None:
 	print "Make sure to pass in login information for ClassCapture and the sftp destination"
 	sys.exit()
 

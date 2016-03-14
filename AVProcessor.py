@@ -6,17 +6,41 @@ import sys
 import time
 import pysftp
 import shutil, os
+from argparse import ArgumentParser
+
+# command line flag parser
+parser = ArgumentParser()
+parser.add_argument("--CCuser", dest="API_username", help="Username to login to ClassCapture")
+parser.add_argument("--CCpass", dest="API_password", help="Password to login to ClassCapture")
+parser.add_argument("--sftpuser", dest="sftp_username", help="Username to login to VM hosting API")
+parser.add_argument("--sftppass", dest="sftp_password", help="Password to login to VM hosting API")
+parser.add_argument("-c", "--clearConfig", action="store_const", const=True, help="Clears local config for which videos have been processed")
+parser.add_argument("-i", "--ignoreConfig", action="store_const", const=True, help="Clears local config for which videos have been processed")
+parser.add_argument("-n", "--noUpdate", action="store_const", const=True, help="Clears local config for which videos have been processed")
+args = parser.parse_args()
+print args
+
+if args.clearConfig:
+	print "Clearing local config"
+	#TODO: Clear local config :)
+	sys.exit()
 
 # Urls and logins
 # API Server
 API_url = "http://classcapture.cs.illinois.edu"
-API_username = "ajou2@illinois.edu"
-API_password = "CCpassword1"
+API_username =  args.API_username
+API_password =  args.API_password
 # API_url = "http://classcapture.ncsa.illinois.edu"
 # sftp to DL files
-sftp_username = "vmuser"
-sftp_password = "freshhook19"
+sftp_username = args.sftp_username
+sftp_password = args.sftp_password
 sftp_url = "classcapture1.cs.illinois.edu"
+
+if API_username is None or API_password is None or sftp_username is None or sfp_username is None:
+	print "Make sure to pass in login information for ClassCapture and the sftp destination"
+	sys.exit()
+
+print args.clearConfig
 
 # Delete all locally stored files in the 2 video directories
 def Cleanup(fileToDelete):
@@ -127,7 +151,7 @@ s = requests.Session()
 # Setup logging
 logfile = time.strftime("%m-%d-%Y-%H:%M:%S")
 # logging.basicConfig(filename='Logs/' + logfile + '.log', level=logging.DEBUG)
-logger = open('Logs/' + logfile + ".log", 'w')
+logger = open('Logs/' + logfile + ".log", 'w+')
 # Login to classcapture
 loggedIn = LoginToCC()
 if loggedIn:
@@ -137,7 +161,6 @@ if loggedIn:
 	videos = [recording['filename'] for recording in recordings]
 	videos = getUnprocessedIndep(videos)
 	writeToLog("Will now download, process, and update " + str(len(videos)) + " files")
-	# Three seperate loops to make log file cleaner (all the downloads + all the processing + all the updating)
 	for video in videos:
 		# Download videos
 		DownloadVideo(video)
@@ -147,3 +170,4 @@ if loggedIn:
 		UpdateVideo(video)
 		# delete unprocessed and processed videos
 		Cleanup(video)
+logger.close()

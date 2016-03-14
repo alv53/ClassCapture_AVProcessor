@@ -18,7 +18,6 @@ parser.add_argument("-c", "--clearConfig", action="store_const", const=True, hel
 parser.add_argument("-i", "--ignoreConfig", action="store_const", const=True, help="Clears local config for which videos have been processed")
 parser.add_argument("-n", "--noUpdate", action="store_const", const=True, help="Clears local config for which videos have been processed")
 args = parser.parse_args()
-print args
 
 if args.clearConfig:
 	print "Clearing local config"
@@ -39,8 +38,6 @@ sftp_url = "classcapture1.cs.illinois.edu"
 if API_username is None or API_password is None or sftp_username is None or sftp_password is None:
 	print "Make sure to pass in login information for ClassCapture and the sftp destination"
 	sys.exit()
-
-print args.clearConfig
 
 # Delete all locally stored files in the 2 video directories
 def Cleanup(fileToDelete):

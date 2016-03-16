@@ -12,8 +12,10 @@ from argparse import ArgumentParser
 parser = ArgumentParser()
 parser.add_argument("--CCuser", dest="API_username", help="Username to login to ClassCapture")
 parser.add_argument("--CCpass", dest="API_password", help="Password to login to ClassCapture")
+parser.add_argument("--CCurl", dest="API_url", help="ClassCapture URL")
 parser.add_argument("--sftpuser", dest="sftp_username", help="Username to login to VM hosting API")
 parser.add_argument("--sftppass", dest="sftp_password", help="Password to login to VM hosting API")
+parser.add_argument("--sftpurl", dest="sftp_url", help="address to login to VM hosting API")
 parser.add_argument("-c", "--clearConfig", action="store_const", const=True, help="Clears local config for which videos have been processed")
 parser.add_argument("-i", "--ignoreConfig", action="store_const", const=True, help="Clears local config for which videos have been processed")
 parser.add_argument("-n", "--noUpdate", action="store_const", const=True, help="Clears local config for which videos have been processed")
@@ -26,16 +28,15 @@ if args.clearConfig:
 
 # Urls and logins
 # API Server
-API_url = "http://classcapture.cs.illinois.edu"
 API_username =  args.API_username
 API_password =  args.API_password
-# API_url = "http://classcapture.ncsa.illinois.edu"
+API_url = args.API_url
 # sftp to DL files
 sftp_username = args.sftp_username
 sftp_password = args.sftp_password
-sftp_url = "classcapture1.cs.illinois.edu"
+sftp_url = args.sftp_url
 
-if API_username is None or API_password is None or sftp_username is None or sftp_password is None:
+if API_username is None or API_password is None or API_url is None or sftp_username is None or sftp_password is None or sftp_url is None:
 	print "Make sure to pass in login information for ClassCapture and the sftp destination"
 	sys.exit()
 

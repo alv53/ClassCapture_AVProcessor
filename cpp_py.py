@@ -25,7 +25,7 @@ the module.
 
         # make module importable in current directory
         shutil.copyfile(os.path.join(os.getcwd(),
-'build/lib.linux-x86_64-2.7/videostab.so'), os.path.join(os.getcwd(),
+'build/lib.linux-x86_64-2.7', modname + '.so'), os.path.join(os.getcwd(),
 'videostab.so'))
 
 if __name__ == '__main__':

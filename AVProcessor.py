@@ -95,7 +95,6 @@ def ProcessVideo(filename):
 	writeToLog("Performing stabilization for file: " + filename)
 	vstab.stab('UnprocessedVideos/' + filename, 'ProcessedVideos/' +
                 filename)
-        shutil.copyfile("UnprocessedVideos/" + filename, "ProcessedVideos/" + filename)
 	writeToLog("\tCompleted stabilization for file: " + filename)
 
 # Update video in API

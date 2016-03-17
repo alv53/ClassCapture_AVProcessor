@@ -8,6 +8,9 @@ import pysftp
 import shutil, os
 from argparse import ArgumentParser
 
+import vstab
+
+
 # command line flag parser
 parser = ArgumentParser()
 parser.add_argument("--CCuser", dest="API_username", help="Username to login to ClassCapture")
@@ -90,10 +93,11 @@ def DownloadVideo(filename):
 # Process video, stored in UnprocessedVideos/ and puts results in ProcessedVideos/
 def ProcessVideo(filename):
 	writeToLog("Performing stabilization for file: " + filename)
-	#TODO: Tim put your algorithm for independent video stabilization here.
-	shutil.copyfile("UnprocessedVideos/" + filename, "ProcessedVideos/" + filename)
+	vstab.stab('UnprocessedVideos/' + filename, 'ProcessedVideos/' +
+                filename)
+        shutil.copyfile("UnprocessedVideos/" + filename, "ProcessedVideos/" + filename)
 	writeToLog("\tCompleted stabilization for file: " + filename)
-	
+
 # Update video in API
 def UpdateVideo(filename):
 	writeToLog("Performing update for file: " + filename)

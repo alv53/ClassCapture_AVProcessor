@@ -1,4 +1,5 @@
 import cpp_py
+
 import os
 import subprocess
 
@@ -7,13 +8,12 @@ def stab(inname, outname):
     """Stabilize a video file.
 
     Args:
-	inname: str, filename of the input video.
-	outname: str, filename of the resulting stabilized video.
+	inname: str, relative path to the input video.
+	outname: str, relative path of where the stabilized video will be saved.
 
     Returns:
 	None
-	Stabilized video will be saved in the current directory.
-	"""
+    """
     # make the C++ vstab code usable in Python
     cpp_py.wrap_cpp("videostab", ["videostab.cpp"])
     import videostab
@@ -49,6 +49,8 @@ def stab(inname, outname):
     # copy original audio to the stabilized video
     subprocess.call(['ffmpeg', '-i', outname_muted, '-i', inname,
         '-c', 'copy', '-map', '0:0', '-map', '1:1?', '-shortest', '-y', outname])
+
+    os.remove(outname_muted)
 
 
 import sys

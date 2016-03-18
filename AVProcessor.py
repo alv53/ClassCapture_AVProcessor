@@ -19,15 +19,12 @@ parser.add_argument("--CCurl", dest="API_url", help="ClassCapture URL")
 parser.add_argument("--sftpuser", dest="sftp_username", help="Username to login to VM hosting API")
 parser.add_argument("--sftppass", dest="sftp_password", help="Password to login to VM hosting API")
 parser.add_argument("--sftpurl", dest="sftp_url", help="address to login to VM hosting API")
-parser.add_argument("-c", "--clearConfig", action="store_const", const=True, help="Clears local config for which videos have been processed")
 parser.add_argument("-i", "--ignoreConfig", action="store_const", const=True, help="Clears local config for which videos have been processed")
 parser.add_argument("-n", "--noUpdate", action="store_const", const=True, help="Clears local config for which videos have been processed")
 args = parser.parse_args()
 
-if args.clearConfig:
-	print "Clearing local config"
-	#TODO: Clear local config :)
-	sys.exit()
+ignoreConfig = args.ignoreConfig if args.ignoreConfig else False
+noUpdate = args.noUpdate if args.noUpdate else False
 
 # Urls and logins
 # API Server
@@ -73,9 +70,12 @@ def writeToLog(message):
 
 # Get a list of files that have not been processed by independent video stabilization
 def getUnprocessedIndep(recordings):
-	# Open config file (used to store update times of recordings)
+	# If the ignoreConfig flag is true or there is no config file, we will process all videos
 	config = ConfigParser.RawConfigParser()
 	config.read("config.cfg")
+	if ignoreConfig or not config.has_section('Independent Video Stabilization'):
+		return recordings
+	# Open config file (used to store update times of recordings)
 	processedVideos = config.get('Independent Video Stabilization', 'files').split(',')
 	# Return the list of recordings not already processed
 	return list(set(recordings) - set(processedVideos))
@@ -93,8 +93,8 @@ def DownloadVideo(filename):
 # Process video, stored in UnprocessedVideos/ and puts results in ProcessedVideos/
 def ProcessVideo(filename):
 	writeToLog("Performing stabilization for file: " + filename)
-	vstab.stab('UnprocessedVideos/' + filename, 'ProcessedVideos/' +
-                filename)
+	#vstab.stab('UnprocessedVideos/' + filename, 'ProcessedVideos/' + filename)
+	shutil.copyfile("UnprocessedVideos/" + filename, "ProcessedVideos/" + filename)
 	writeToLog("\tCompleted stabilization for file: " + filename)
 
 # Update video in API
@@ -111,18 +111,24 @@ def UpdateVideo(filename):
 	#Update config
 	config = ConfigParser.RawConfigParser()
 	config.read("config.cfg")
+	if not config.has_section('Independent Video Stabilization'):
+		config.add_section('Independent Video Stabilization')
+		config.set('Independent Video Stabilization', 'files', '')
+		config.set('Independent Video Stabilization', 'last update', '')
 	processedVideos = config.get('Independent Video Stabilization', 'files').split(',')
 	# If there are no files, just make the config value the current file, else append the file to the list
 	if len(processedVideos) == 1 and processedVideos[0] == '':
 		processedVideos = [filename]
 	else:
 		processedVideos.append(filename)
+
 	config.set('Independent Video Stabilization', 'files', ','.join(processedVideos))
 	# Update time
 	currTime = time.strftime("%m-%d-%Y-%H:%M:%S")
-	config.set('Independent Video Stabilization', 'last update', currTime)
-	with open('config.cfg', 'w+') as configfile:
-		config.write(configfile)
+	if not noUpdate:
+		config.set('Independent Video Stabilization', 'last update', currTime)
+		with open('config.cfg', 'w+') as configfile:
+			config.write(configfile)
 	writeToLog("\tCompleted update for file: " + filename)
 
 # Login with a valid classcapture account

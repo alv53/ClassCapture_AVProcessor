@@ -93,8 +93,9 @@ def DownloadVideo(filename):
 # Process video, stored in UnprocessedVideos/ and puts results in ProcessedVideos/
 def ProcessVideo(filename):
 	writeToLog("Performing stabilization for file: " + filename)
-	#vstab.stab('UnprocessedVideos/' + filename, 'ProcessedVideos/' + filename)
-	shutil.copyfile("UnprocessedVideos/" + filename, "ProcessedVideos/" + filename)
+	vstab.stab('UnprocessedVideos/' + filename, 'ProcessedVideos/' + filename)
+	#uncomment the bottom line and comment the above to have no processing done, just copy uploaded
+	#shutil.copyfile("UnprocessedVideos/" + filename, "ProcessedVideos/" + filename)
 	writeToLog("\tCompleted stabilization for file: " + filename)
 
 # Update video in API

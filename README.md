@@ -15,3 +15,40 @@ Since our audio/video processing algorithms were already being developed in Pyth
 	- It may be worth looking into just deleting and recreating these directories each time, but they don't hurt.
 - config.cfg
 	- This file is written using Python's [ConfigParser](https://docs.python.org/2/library/configparser.html) to keep track of which files have been processed, and with which algorithm.
+
+## Command line arguments
+- Required arguments:
+	- CCuser: username to login to classcapture.
+	- CCpass: password to login to classcapture.
+	- CCurl: url for classcapture
+	- sftpuser: username to login to the VM hosting the API server.
+	- sftppass: password to login to the VM hosting the API server.
+	- sftpurl: address of VM hosting API.
+- Optional flags:
+	- -i, --ignoreConfig: Ignores the config.cfg when checking which files need to be updates. Will update every file instead.
+	- -n, --noUpdate: Will run the AVProcessor without updating the config.cfg.
+
+## A/V Algorithms
+- These are the algorithms that will be run on the videos stored in the API server.
+- Stored under Algs/ where each algorithm has it's own directory.
+- To add a new algorithm:
+	1. Create a subdirectory under Algs/ with the necessary files for your algorithm.
+	2. Add an import to import from the Algs/\<subdirectory\>/, importing the necessary python function. The python function should take 2 parameters, the input file, and the resulting output file from the algorithm.
+	3. Add an empty \_\_init\_\_.py file into the Algs/\<subdirectory\>/
+	4. Add to the algs dictionary, mapping the algorithm name to the given 2 parameter function from above. For example, if I had an a file AlvinsAlg.py, which contained a function myStabilize(inname, outname). The resulting changes to AVProcessor.py would look like this:
+	
+	```
+	# Added this import line
+	from Alg/<subdirectory>/ import AlvinsAlg
+	...
+	algs = { 
+		...
+		# Added this line to the algs dict
+		"AlvinsAlgorithmThingy" : AlvinsAlg.myStabilize,
+		...
+		}
+	```
+- Algorithms included:
+	- TimsVstab: \<Tim put your description of the algorithm here\>
+	- DirectCopy: Creates an exact copy of the video, more for testing purposes
+	- DirectCopy2: Same as DirectCopy

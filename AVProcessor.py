@@ -29,8 +29,8 @@ parser.add_argument("--CCurl", dest="API_url", help="ClassCapture URL")
 parser.add_argument("--sftpuser", dest="sftp_username", help="Username to login to VM hosting API")
 parser.add_argument("--sftppass", dest="sftp_password", help="Password to login to VM hosting API")
 parser.add_argument("--sftpurl", dest="sftp_url", help="address to login to VM hosting API")
-parser.add_argument("-i", "--ignoreConfig", action="store_const", const=True, help="Clears local config for which videos have been processed")
-parser.add_argument("-n", "--noUpdate", action="store_const", const=True, help="Clears local config for which videos have been processed")
+parser.add_argument("-i", "--ignoreConfig", action="store_const", const=True, help="Ignores the config.cfg when checking which files need to be updates. Will update every file instead.")
+parser.add_argument("-n", "--noUpdate", action="store_const", const=True, help="Will run the AVProcessor without updating the config.cfg.")
 args = parser.parse_args()
 
 # Parse command line flags

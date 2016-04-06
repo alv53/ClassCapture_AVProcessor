@@ -48,7 +48,7 @@ def stab(inname, outname):
 
     # copy original audio to the stabilized video
     subprocess.call(['ffmpeg', '-i', outname_muted, '-i', inname,
-        '-c', 'copy', '-map', '0:0', '-map', '1:1?', '-shortest', '-y', outname])
+        '-c', 'copy', '-map', '0:0', '-map', '1:1?', '-shortest', '-y', '-acodec', 'aac', outname])
 
     os.remove(outname_muted)
 

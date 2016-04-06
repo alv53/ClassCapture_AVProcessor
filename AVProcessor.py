@@ -6,6 +6,7 @@ import sys
 import time
 import pysftp
 import os
+import shutil
 from argparse import ArgumentParser
 
 # Modules for AV processing here
@@ -163,6 +164,11 @@ def GetRecordingsJson():
 	headers = {'Content-type': 'application/json', 'Accept': 'text/plain', 'consumer-device-id': 123}
 	r = s.get(recordings_url, headers=headers)
 	return r.content
+# Create directories for local video processing
+if not os.path.exists("ProcessedVideos"):
+	os.makedirs("ProcessedVideos")
+if not os.path.exists("UnprocessedVideos"):
+	os.makedirs("UnprocessedVideos")
 
 # Start a session to save cookies 
 s = requests.Session()
@@ -190,3 +196,6 @@ if loggedIn:
 			# delete unprocessed and processed videos
 			Cleanup(video)
 logger.close()
+# delete temp folders
+shutil.rmtree("ProcessedVideos")
+shutil.rmtree("UnprocessedVideos")

@@ -52,12 +52,6 @@ struct Trajectory
 
 int stabilize(char* filename, int rotation)
 {
-    // For further analysis
-    ofstream out_transform("prev_to_cur_transformation.txt");
-    ofstream out_trajectory("trajectory.txt");
-    ofstream out_smoothed_trajectory("smoothed_trajectory.txt");
-    ofstream out_new_transform("new_prev_to_cur_transformation.txt");
-
     VideoCapture cap(filename);
     assert(cap.isOpened());
 	
@@ -124,8 +118,6 @@ int stabilize(char* filename, int rotation)
 
         prev_to_cur_transform.push_back(TransformParam(dx, dy, da));
 
-        out_transform << k << " " << dx << " " << dy << " " << da << endl;
-
         cur.copyTo(prev);
         cur_grey.copyTo(prev_grey);
 
@@ -148,8 +140,6 @@ int stabilize(char* filename, int rotation)
         a += prev_to_cur_transform[i].da;
 
         trajectory.push_back(Trajectory(x,y,a));
-
-        out_trajectory << (i+1) << " " << x << " " << y << " " << a << endl;
     }
 
     // Step 3 - Smooth out the trajectory using an averaging window
@@ -176,8 +166,6 @@ int stabilize(char* filename, int rotation)
         double avg_y = sum_y / count;
 
         smoothed_trajectory.push_back(Trajectory(avg_x, avg_y, avg_a));
-
-        out_smoothed_trajectory << (i+1) << " " << avg_x << " " << avg_y << " " << avg_a << endl;
     }
 
     // Step 4 - Generate new set of previous to current transform, such that the trajectory ends up being the same as the smoothed trajectory
@@ -203,8 +191,6 @@ int stabilize(char* filename, int rotation)
         double da = prev_to_cur_transform[i].da + diff_a;
 
         new_prev_to_cur_transform.push_back(TransformParam(dx, dy, da));
-
-        out_new_transform << (i+1) << " " << dx << " " << dy << " " << da << endl;
     }
 
     // Step 5 - Apply the new transformation to the video

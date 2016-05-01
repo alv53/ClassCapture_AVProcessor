@@ -17,10 +17,10 @@ from Algs.DirectCopy2 import DirectCopy2
 # List of algoritms here
 # direct_copy and direct_copy2 are test algorithms. Delete when we have more working algorithms
 algs = {
-		#"Vstab" : vstab.stab,
-		"direct_copy" : DirectCopy.createCopy, 
-		"direct_copy2" : DirectCopy2.createCopyTwo,
-	    }
+        #"Vstab" : vstab.stab,
+        "direct_copy" : DirectCopy.createCopy,
+        "direct_copy2" : DirectCopy2.createCopyTwo,
+        }
 
 # Command line flag parser
 parser = ArgumentParser()
@@ -49,128 +49,128 @@ sftp_url = args.sftp_url
 
 # Verify that all required flags are provided
 if API_username is None or API_password is None or API_url is None or sftp_username is None or sftp_password is None or sftp_url is None:
-	print "Make sure to pass in login information for ClassCapture and the sftp destination"
-	sys.exit()
+    print "Make sure to pass in login information for ClassCapture and the sftp destination"
+    sys.exit()
 
 # Delete all locally stored files in the 2 video directories
 def Cleanup(fileToDelete):
-	# delete ProcessedVideos/*file*
-	WriteToLog("Cleanup for " + fileToDelete)
-	try:
-		filename = "ProcessedVideos/" + fileToDelete
-		if os.path.isfile(filename):
-			os.remove(filename)
-			WriteToLog("\tDeleted " + fileToDelete + " from ProcessedVideos.")
-	except Exception, e:
-		print e
-		WriteToLog("\tFailed to delete " + fileToDelete + " from ProcessedVideos.")
-	# delete UnprocessedVideos/*file*
-	try:
-		filename = "UnprocessedVideos/" + fileToDelete
-		if os.path.isfile(filename):
-			os.remove(filename)
-			WriteToLog("\tDeleted " + fileToDelete + " from UnprocessedVideos.")
-	except Exception, e:
-		print e
-		WriteToLog("\tFailed to delete " + fileToDelete + " from UnprocessedVideos.")
+    # delete ProcessedVideos/*file*
+    WriteToLog("Cleanup for " + fileToDelete)
+    try:
+        filename = "ProcessedVideos/" + fileToDelete
+        if os.path.isfile(filename):
+            os.remove(filename)
+            WriteToLog("\tDeleted " + fileToDelete + " from ProcessedVideos.")
+    except Exception, e:
+        print e
+        WriteToLog("\tFailed to delete " + fileToDelete + " from ProcessedVideos.")
+    # delete UnprocessedVideos/*file*
+    try:
+        filename = "UnprocessedVideos/" + fileToDelete
+        if os.path.isfile(filename):
+            os.remove(filename)
+            WriteToLog("\tDeleted " + fileToDelete + " from UnprocessedVideos.")
+    except Exception, e:
+        print e
+        WriteToLog("\tFailed to delete " + fileToDelete + " from UnprocessedVideos.")
 # Write to log in format timestampe: message
 def WriteToLog(message):
-	currTime = time.strftime("%H:%M:%S")
-	logMsg = currTime + ": " + message
-	logger.write(logMsg + "\n")
-	print logMsg
+    currTime = time.strftime("%H:%M:%S")
+    logMsg = currTime + ": " + message
+    logger.write(logMsg + "\n")
+    print logMsg
 
 # Get a list of files that have not been processed by independent video stabilization
 def GetUnprocessed(algName, recordings):
-	# If the ignoreConfig flag is true or there is no config file, we will process all videos
-	config = ConfigParser.RawConfigParser()
-	config.read("config.cfg")
-	if ignoreConfig or not config.has_section(algName):
-		return recordings
-	# Open config file (used to store update times of recordings)
-	processedVideos = config.get(algName, 'files').split(',')
-	# Return the list of recordings not already processed
-	return list(set(recordings) - set(processedVideos))
+    # If the ignoreConfig flag is true or there is no config file, we will process all videos
+    config = ConfigParser.RawConfigParser()
+    config.read("config.cfg")
+    if ignoreConfig or not config.has_section(algName):
+        return recordings
+    # Open config file (used to store update times of recordings)
+    processedVideos = config.get(algName, 'files').split(',')
+    # Return the list of recordings not already processed
+    return list(set(recordings) - set(processedVideos))
 
 # Download file from server
 def DownloadVideo(filename):
-	WriteToLog("Performing download for file: " + filename)
-	path = "classcapture_videos/" + filename
-	localpath = "UnprocessedVideos/" + filename
-	with pysftp.Connection(sftp_url, username=sftp_username, password=sftp_password) as sftp:
-		# Put file into UnprocessedVideos/ directory
-		sftp.get(path, localpath)
-		WriteToLog("\tCompleted download for file: " + filename)
+    WriteToLog("Performing download for file: " + filename)
+    path = "classcapture_videos/" + filename
+    localpath = "UnprocessedVideos/" + filename
+    with pysftp.Connection(sftp_url, username=sftp_username, password=sftp_password) as sftp:
+        # Put file into UnprocessedVideos/ directory
+        sftp.get(path, localpath)
+        WriteToLog("\tCompleted download for file: " + filename)
 
 # Process video, stored in UnprocessedVideos/ and puts results in ProcessedVideos/
 def ProcessVideo(filename, algName, algFn):
-	WriteToLog("Performing " + algName +" for file: " + filename)
-	algFn('UnprocessedVideos/' + filename, 'ProcessedVideos/' + filename)
-	#uncomment the bottom line and comment the above to have no processing done, just copy uploaded
-	WriteToLog("\tCompleted " + algName + " for file: " + filename)
+    WriteToLog("Performing " + algName +" for file: " + filename)
+    algFn('UnprocessedVideos/' + filename, 'ProcessedVideos/' + filename)
+    #uncomment the bottom line and comment the above to have no processing done, just copy uploaded
+    WriteToLog("\tCompleted " + algName + " for file: " + filename)
 
 # Update video in API
 def UpdateVideo(filename, algName):
-	WriteToLog("Performing update for " + algName + " on file: " + filename)
+    WriteToLog("Performing update for " + algName + " on file: " + filename)
 
-	# sftp in and update video
-	localpath = "ProcessedVideos/" + filename
-	with pysftp.Connection(sftp_url, username=sftp_username, password=sftp_password) as sftp:
-		with sftp.cd('classcapture_videos/'):
-			sftp.put(localpath)
-			WriteToLog("\tUploaded to API, file: " + filename)
+    # sftp in and update video
+    localpath = "ProcessedVideos/" + filename
+    with pysftp.Connection(sftp_url, username=sftp_username, password=sftp_password) as sftp:
+        with sftp.cd('classcapture_videos/'):
+            sftp.put(localpath)
+            WriteToLog("\tUploaded to API, file: " + filename)
 
-	#Update config
-	config = ConfigParser.RawConfigParser()
-	config.read("config.cfg")
-	if not config.has_section(algName):
-		config.add_section(algName)
-		config.set(algName, 'files', '')
-		config.set(algName, 'last update', '')
-	processedVideos = config.get(algName, 'files').split(',')
-	# If there are no files, just make the config value the current file, else append the file to the list
-	if len(processedVideos) == 1 and processedVideos[0] == '':
-		processedVideos = [filename]
-	else:
-		processedVideos.append(filename)
+    #Update config
+    config = ConfigParser.RawConfigParser()
+    config.read("config.cfg")
+    if not config.has_section(algName):
+        config.add_section(algName)
+        config.set(algName, 'files', '')
+        config.set(algName, 'last update', '')
+    processedVideos = config.get(algName, 'files').split(',')
+    # If there are no files, just make the config value the current file, else append the file to the list
+    if len(processedVideos) == 1 and processedVideos[0] == '':
+        processedVideos = [filename]
+    else:
+        processedVideos.append(filename)
 
-	config.set(algName, 'files', ','.join(processedVideos))
-	# Update time
-	currTime = time.strftime("%m-%d-%Y-%H:%M:%S")
-	if not noUpdate:
-		config.set(algName, 'last update', currTime)
-		with open('config.cfg', 'w+') as configfile:
-			config.write(configfile)
-	WriteToLog("\tCompleted update for file: " + filename)
+    config.set(algName, 'files', ','.join(processedVideos))
+    # Update time
+    currTime = time.strftime("%m-%d-%Y-%H:%M:%S")
+    if not noUpdate:
+        config.set(algName, 'last update', currTime)
+        with open('config.cfg', 'w+') as configfile:
+            config.write(configfile)
+    WriteToLog("\tCompleted update for file: " + filename)
 
 # Login with a valid classcapture account
 def LoginToCC():
-	WriteToLog("Attempting to login to ClassCapture")
-	login_url = API_url + "/api/user/login"
-	data = {"email":API_username ,"password":API_password}
-	headers = {'Content-type': 'application/json', 'Accept': 'text/plain', 'consumer-device-id': 123}
-	r = s.post(login_url, data=json.dumps(data), headers=headers)
+    WriteToLog("Attempting to login to ClassCapture")
+    login_url = API_url + "/api/user/login"
+    data = {"email":API_username ,"password":API_password}
+    headers = {'Content-type': 'application/json', 'Accept': 'text/plain', 'consumer-device-id': 123}
+    r = s.post(login_url, data=json.dumps(data), headers=headers)
 
-	# Check for correct login
-	if r.status_code != 200:
-		WriteToLog("Failure to login to " + API_url)
-		return False
-	WriteToLog("\tLogged into " + API_url)
-	return True
+    # Check for correct login
+    if r.status_code != 200:
+        WriteToLog("Failure to login to " + API_url)
+        return False
+    WriteToLog("\tLogged into " + API_url)
+    return True
 
 def GetRecordingsJson():
-	# Grab all of the recordings from classcapture
-	recordings_url = API_url + "/api/recording"
-	headers = {'Content-type': 'application/json', 'Accept': 'text/plain', 'consumer-device-id': 123}
-	r = s.get(recordings_url, headers=headers)
-	return r.content
+    # Grab all of the recordings from classcapture
+    recordings_url = API_url + "/api/recording"
+    headers = {'Content-type': 'application/json', 'Accept': 'text/plain', 'consumer-device-id': 123}
+    r = s.get(recordings_url, headers=headers)
+    return r.content
 # Create directories for local video processing
 if not os.path.exists("ProcessedVideos"):
-	os.makedirs("ProcessedVideos")
+    os.makedirs("ProcessedVideos")
 if not os.path.exists("UnprocessedVideos"):
-	os.makedirs("UnprocessedVideos")
+    os.makedirs("UnprocessedVideos")
 
-# Start a session to save cookies 
+# Start a session to save cookies
 s = requests.Session()
 # Setup logging
 logfile = time.strftime("%m-%d-%Y-%H:%M:%S")
@@ -179,22 +179,22 @@ logger = open('Logs/' + logfile + ".log", 'w+')
 # Login to classcapture
 loggedIn = LoginToCC()
 if loggedIn:
-	# Get all of the recording
-	recordings = json.loads(GetRecordingsJson())
-	# First we will run independent video stabilization on videos that have not been processed before
-	allvideos = [recording['filename'] for recording in recordings]
-	for name,alg in algs.iteritems():
-		videos = GetUnprocessed(name, allvideos)
-		WriteToLog("Will now perform " + str(name) + " on " + str(len(videos)) + " files.")
-		for video in videos:
-			# Download videos
-			DownloadVideo(video)
-			# Process videos
-			ProcessVideo(video, name, alg)
-			# Update videos in API
-			UpdateVideo(video, name)
-			# delete unprocessed and processed videos
-			Cleanup(video)
+    # Get all of the recording
+    recordings = json.loads(GetRecordingsJson())
+    # First we will run independent video stabilization on videos that have not been processed before
+    allvideos = [recording['filename'] for recording in recordings]
+    for name,alg in algs.iteritems():
+        videos = GetUnprocessed(name, allvideos)
+        WriteToLog("Will now perform " + str(name) + " on " + str(len(videos)) + " files.")
+        for video in videos:
+            # Download videos
+            DownloadVideo(video)
+            # Process videos
+            ProcessVideo(video, name, alg)
+            # Update videos in API
+            UpdateVideo(video, name)
+            # delete unprocessed and processed videos
+            Cleanup(video)
 logger.close()
 # delete temp folders
 shutil.rmtree("ProcessedVideos")

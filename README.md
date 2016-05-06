@@ -52,3 +52,14 @@ Since our audio/video processing algorithms were already being developed in Pyth
 	- TimsVstab: \<Tim put your description of the algorithm here\>
 	- DirectCopy: Creates an exact copy of the video, more for testing purposes
 	- DirectCopy2: Same as DirectCopy
+
+## How to deploy using CronTab
+A machine's CronTab is just a simple text file that has a list of commands meant to run at a certain time, which is performed by the Cron Daemon. In order to schedule a VM to run this processor, you would do something like:
+
+First edit the CronTab file. 
+
+```crontab -e```
+
+Add a line like this to the file:
+
+```00 4 * * * cd ~/ClassCapture_AVProcessor/ && python AVProcessor.py --CCuser=<username here> --CCpass=<password here> --CCurl=<ClassCapture URL> --sftpuser=<login for API VM> --sftppass=<password for API> --sftpurl=<API Url>```
